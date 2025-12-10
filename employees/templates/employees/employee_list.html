@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Employees</h2>
+
+<form method="get" class="row g-2 mb-3">
+  <div class="col-sm-4">
+    <input type="text" name="q" value="{{ request.GET.q }}" class="form-control" placeholder="Search name, email or role">
+  </div>
+  <div class="col-sm-3">
+    <select name="department" class="form-select">
+      <option value="">All Departments</option>
+      {% for code,label in employees.model.DEPARTMENT_CHOICES %}
+      <option value="{{ code }}" {% if request.GET.department == code %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-sm-2">
+    <select name="status" class="form-select">
+      <option value="">All Status</option>
+      <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
+      <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option>
+    </select>
+  </div>
+  <div class="col-sm-2">
+    <select name="sort" class="form-select">
+      <option value="">Sort</option>
+      <option value="date_desc" {% if request.GET.sort == 'date_desc' %}selected{% endif %}>Newest</option>
+      <option value="date_asc" {% if request.GET.sort == 'date_asc' %}selected{% endif %}>Oldest</option>
+    </select>
+  </div>
+  <div class="col-sm-1">
+    <button class="btn btn-primary">Go</button>
+  </div>
+</form>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>#</th><th>Name</th><th>Email</th><th>Department</th><th>Role</th><th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for emp in employees %}
+    <tr>
+      <td>{{ emp.id }}</td>
+      <td><a href="{{ emp.get_absolute_url }}">{{ emp.first_name }} {{ emp.last_name }}</a></td>
+      <td>{{ emp.email }}</td>
+      <td>{{ emp.get_department_display }}</td>
+      <td>{{ emp.role }}</td>
+      <td>
+        <a href="{% url 'employees:employee-edit' emp.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+        <a href="{% url 'employees:employee-delete' emp.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="6">No employees found.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<nav aria-label="Page navigation">
+  <ul class="pagination">
+    {% if page_obj.has_previous %}
+    <li class="page-item"><a class="page-link" href="?{% querystring request GET 'page' page_obj.previous_page_number %}">Prev</a></li>
+    {% endif %}
+    <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+    {% if page_obj.has_next %}
+    <li class="page-item"><a class="page-link" href="?{% querystring request GET 'page' page_obj.next_page_number %}">Next</a></li>
+    {% endif %}
+  </ul>
+</nav>
+
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>{% if object %}Edit{% else %}Add{% endif %} Employee</h2>
+
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+  <div class="row">
+    {% for field in form %}
+      <div class="mb-3 col-md-6">
+        <label class="form-label">{{ field.label_tag }}</label>
+        {{ field }}
+        {% if field.help_text %}
+          <small class="form-text text-muted">{{ field.help_text }}</small>
+        {% endif %}
+        {{ field.errors }}
+      </div>
+    {% endfor %}
+  </div>
+  <button class="btn btn-success">Save</button>
+  <a href="{% url 'employees:employee-list' %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}
